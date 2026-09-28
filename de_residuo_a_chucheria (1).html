@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De residuo a chuchería — El reto</title>
+<style>
+:root{--green:#1f6b45;--green2:#2f8a5b;--cream:#fff8e8;--ink:#20352a;--muted:#65766d;--orange:#e99135;--red:#c95b4c;--line:#dce7df}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at top left,#fff5cf 0,#f4f8f2 35%,#e8f3eb 100%);min-height:100vh}
+.wrap{max-width:1100px;margin:auto;padding:24px 18px 60px}
+header{background:linear-gradient(135deg,#153e2c,#28744c);color:#fff;border-radius:28px;padding:28px;box-shadow:0 18px 45px #17412b25;position:relative;overflow:hidden}
+header:after{content:"🍊  🍎  🍋  🍌  🍓  🍐";position:absolute;right:22px;bottom:10px;font-size:34px;opacity:.18}
+h1{font-size:clamp(30px,5vw,52px);margin:0 0 8px;letter-spacing:-1px}
+h2{margin:0 0 10px}
+h3{margin:0 0 8px}
+.subtitle{font-size:17px;line-height:1.55;max-width:750px;opacity:.9}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.pill{border:1px solid #ffffff38;background:#ffffff14;border-radius:999px;padding:7px 11px;font-size:12px}
+.progressbar{height:9px;background:#dfe9e2;border-radius:99px;overflow:hidden;margin-top:18px}
+.progressbar span{display:block;height:100%;background:var(--orange);transition:.35s}
+.card{background:#fff;border:1px solid #dfe9e2;border-radius:22px;padding:22px;margin-top:18px;box-shadow:0 9px 26px #25493612}
+.intro{display:flex;gap:18px;align-items:flex-start}
+.intro .symbol{font-size:46px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:15px;margin-top:18px}
+.fruit{background:#fff;border:2px solid var(--line);border-radius:20px;padding:18px;cursor:pointer;transition:.18s;position:relative;min-height:265px}
+.fruit:hover{transform:translateY(-3px);box-shadow:0 12px 25px #244b3515}
+.fruit.selected{border-color:var(--orange);background:#fff8eb;box-shadow:0 0 0 3px #e9913518}
+.fruit.selected:after{content:"✓";position:absolute;right:15px;top:15px;width:29px;height:29px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;font-weight:900}
+.fruit .emoji{font-size:55px}
+.fruit .title{font-size:22px;font-weight:850}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0}
+.tag{background:#edf5ef;border-radius:9px;padding:5px 8px;font-size:11px;font-weight:800}
+.info{font-size:14px;line-height:1.5;color:#4c5d54}
+.notice{background:#f1f7f3;border-left:5px solid var(--green2);padding:14px 16px;border-radius:12px;line-height:1.55}
+.notice.warn{background:#fff5e9;border-left-color:var(--orange)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button{border:0;border-radius:13px;padding:12px 18px;background:var(--green);color:#fff;font-size:15px;font-weight:850;cursor:pointer;transition:.15s}
+button:hover{filter:brightness(1.05);transform:translateY(-1px)}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+button.secondary{background:#edf2ee;color:#294337}
+.stage{font-size:12px;color:#68776f;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.partcard{margin-top:14px;border:1px solid var(--line);border-radius:18px;padding:17px;background:#fbfdfb}
+.parthead{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.partemoji{font-size:30px}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.option{border:2px solid #e0e8e2;border-radius:13px;padding:12px;cursor:pointer;background:#fff;min-height:88px}
+.option:hover{border-color:#80ad91}
+.option.active{border-color:var(--green2);background:#eef8f1}
+.option strong{display:block;font-size:13px;margin-bottom:5px}
+.option span{font-size:12px;color:var(--muted);line-height:1.35}
+.recipe-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;margin-top:16px}
+.recipe{border:2px solid var(--line);border-radius:20px;padding:20px;cursor:pointer;background:#fff;min-height:190px}
+.recipe:hover{border-color:#80ad91}
+.recipe.active{border-color:var(--green2);background:#eff8f1}
+.recipe .emoji{font-size:42px}
+.recipe p{line-height:1.5;color:#506158}
+.inventory{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:15px}
+.inv{background:#f4f8f5;border-radius:15px;padding:14px;text-align:center}
+.inv b{display:block;font-size:23px;margin-bottom:3px}
+.inv small{color:var(--muted)}
+.incident{border-radius:22px;background:linear-gradient(135deg,#fff8eb,#fff);border:2px solid #f0d9b5;padding:23px}
+.incident-icon{font-size:55px}
+.inc-options{display:grid;gap:10px;margin-top:18px}
+.inc-option{border:2px solid var(--line);background:#fff;border-radius:15px;padding:15px;cursor:pointer}
+.inc-option:hover{border-color:#8bb199}
+.inc-option.active{border-color:var(--green2);background:#eff8f1}
+.result{text-align:center;padding:34px}
+.result .big{font-size:75px}
+.result h2{font-size:32px}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;text-align:left;margin:24px 0}
+.result-stat{background:#f4f8f5;border-radius:16px;padding:15px}
+.result-stat b{display:block;font-size:20px;margin-bottom:4px}
+.explain{text-align:left;background:#fafcfb;border-radius:18px;padding:20px;line-height:1.6}
+.hidden{display:none}
+ul{line-height:1.7}
+@media(max-width:700px){.options{grid-template-columns:1fr}.inventory{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="stage">Reto de economía circular</div>
+<h1>🍬 De residuo a chuchería</h1>
+<div class="subtitle">No gana quien tira menos por casualidad. Gana quien consigue <b>pensar todo el proceso</b>: recuperar → separar → transformar → reaccionar ante imprevistos.</div>
+<div class="pills">
+<div class="pill">🧠 Decisiones encadenadas</div>
+<div class="pill">♻️ Aprovechamiento</div>
+<div class="pill">⚠️ Imprevistos</div>
+<div class="pill">🚫 Sin puntos visibles</div>
+</div>
+</header>
+<div id="app"></div>
+</div>
+
+<script>
+const fruits=[
+{
+ id:"orange",emoji:"🍊",name:"Naranjas",kg:5,
+ visual:"Piel arrugada y color irregular.",
+ smell:"Aroma cítrico normal.",
+ texture:"Pulpa muy jugosa y algo blanda.",
+ clue:"Muy maduras, pero sin señales de moho.",
+ parts:[
+  ["pulpa","🍊","La pulpa está jugosa y es una buena base."],
+  ["zumo","💧","Hay bastante líquido aprovechable si se filtra."],
+  ["cascara","🌿","La cáscara puede aportar aroma si se limpia correctamente."]
+ ]
+},
+{
+ id:"apple",emoji:"🍎",name:"Manzanas",kg:4,
+ visual:"Golpes superficiales y aspecto poco uniforme.",
+ smell:"Aroma fresco.",
+ texture:"Firmes salvo en las zonas golpeadas.",
+ clue:"El daño es principalmente externo.",
+ parts:[
+  ["pulpa","🍎","La parte sana puede separarse de los golpes."],
+  ["piel","🌿","La piel está en buen estado y puede tener un uso."]
+ ]
+},
+{
+ id:"lemon",emoji:"🍋",name:"Limones",kg:3,
+ visual:"Manchas externas y formas irregulares.",
+ smell:"Aroma cítrico intenso.",
+ texture:"Firmes.",
+ clue:"El aspecto exterior es peor que su estado interior.",
+ parts:[
+  ["pulpa","🍋","Parte aprovechable, aunque no es la que más interesa para ciertas recetas."],
+  ["zumo","💧","Zumo ácido y aromático."],
+  ["cascara","🌿","Cáscara con mucho aroma; necesita limpieza adecuada."]
+ ]
+},
+{
+ id:"banana",emoji:"🍌",name:"Plátanos",kg:6,
+ visual:"Piel muy oscura.",
+ smell:"Aroma dulce normal.",
+ texture:"Pulpa blanda.",
+ clue:"Muy maduros; la pulpa sigue siendo aprovechable.",
+ parts:[
+  ["pulpa","🍌","Muy útil para dar dulzor y cuerpo."],
+  ["piel","🌿","Puede valorizarse, pero no es imprescindible para todas las recetas."]
+ ]
+},
+{
+ id:"strawberry",emoji:"🍓",name:"Fresas",kg:2,
+ visual:"Maduración desigual; algunas muy blandas.",
+ smell:"Aroma normal de fresa.",
+ texture:"Unidades con distinta firmeza.",
+ clue:"Hay que revisar las unidades individualmente.",
+ parts:[
+  ["pulpa","🍓","Aporta sabor y color, pero hay que separar unidades deterioradas."]
+ ]
+},
+{
+ id:"pear",emoji:"🍐",name:"Peras",kg:4,
+ visual:"Varias unidades muy blandas y con zonas deterioradas.",
+ smell:"Algunas tienen olor extraño.",
+ texture:"Muy blandas.",
+ clue:"El deterioro es mayor que en otros lotes.",
+ parts:[
+  ["pulpa","🍐","Solo podría aprovecharse tras una revisión estricta de las unidades."],
+  ["piel","🌿","La piel no compensa si el lote presenta deterioro importante."]
+ ]
+}
+];
+
+const recipes=[
+{
+ id:"gummies",emoji:"🍬",name:"Gominolas de fruta",
+ need:"Pulpa + líquido de fruta",
+ logic:"Necesitas una base de pulpa y una pequeña cantidad de líquido."
+},
+{
+ id:"strips",emoji:"🍓",name:"Tiras de fruta",
+ need:"Pulpa + piel/cáscara aprovechable",
+ logic:"La receta está pensada para aprovechar una parte exterior además de la pulpa."
+},
+{
+ id:"citrus",emoji:"🍋",name:"Gominolas cítricas",
+ need:"Zumo + cáscara cítrica",
+ logic:"La combinación depende especialmente de disponer de zumo y cáscara de cítricos."
+}
+];
+
+const incidents=[
+{
+ icon:"🔥",title:"La mezcla se calienta demasiado",
+ text:"Durante el proceso detectas que la temperatura está subiendo más de lo previsto.",
+ choices:[
+  ["Reducir el calentamiento y controlar la mezcla antes de continuar.","good"],
+  ["Subir todavía más la temperatura para acabar antes.","bad"],
+  ["Tirar toda la mezcla sin comprobar su estado.","waste"]
+ ]
+},
+{
+ icon:"🔎",title:"Detectas una unidad deteriorada",
+ text:"Al revisar la materia prima aparece una pieza que no debería haber entrado en la preparación.",
+ choices:[
+  ["Retirarla y revisar el material antes de continuar.","good"],
+  ["Mezclarla para que no se note.","bad"],
+  ["Desechar todo el lote sin revisarlo.","waste"]
+ ]
+},
+{
+ icon:"📦",title:"Te sobra materia prima",
+ text:"Al terminar, queda una pequeña cantidad de material que todavía podría tener un uso.",
+ choices:[
+  ["Separarlo y buscar un uso posterior seguro y planificado.","good"],
+  ["Añadirlo a la chuchería aunque no sea compatible.","bad"],
+  ["Tirarlo directamente sin valorar alternativas.","waste"]
+ ]
+},
+{
+ icon:"♻️",title:"Has generado demasiada cáscara",
+ text:"La receta necesita menos cáscara de la que has separado.",
+ choices:[
+  ["Separarla para otra valorización adecuada.","good"],
+  ["Forzar toda la cáscara dentro de la receta.","bad"],
+  ["Mezclarla con el resto de residuos.","waste"]
+ ]
+}
+];
+
+let state={
+ phase:0,
+ selected:[],
+ partChoices:{},
+ recipe:null,
+ incident:null,
+ incidentChoice:null
+};
+
+function app(){return document.getElementById("app")}
+function progress(p){return `<div class="progressbar"><span style="width:${p}%"></span></div>`}
+
+function phase1(){
+app().innerHTML=`
+<div class="card intro">
+<div class="symbol">🔎</div><div>
+<div class="stage">Fase 1 de 4</div>
+<h2>Elige qué fruta merece una segunda oportunidad</h2>
+<p>Hay seis lotes. Solo puedes recuperar <b>3</b>. No hay una pista que diga directamente cuál es “la correcta”. Mira el estado, el olor, la textura y piensa en qué partes podrían ser útiles en una chuchería.</p>
+<div class="notice">🧠 <b>Regla:</b> el aspecto feo no significa automáticamente que una fruta no sea aprovechable, pero las señales de deterioro sí deben hacerte pensar.</div>
+${progress(20)}
+</div></div>
+<div class="grid">
+${fruits.map(f=>`
+<div class="fruit ${state.selected.includes(f.id)?"selected":""}" onclick="toggleFruit('${f.id}')">
+<div class="emoji">${f.emoji}</div>
+<div class="title">${f.name}</div>
+<div class="meta"><span class="tag">${f.kg} kg</span><span class="tag">${f.parts.length} partes posibles</span></div>
+<div class="info"><b>Aspecto:</b> ${f.visual}<br><b>Olor:</b> ${f.smell}<br><b>Textura:</b> ${f.texture}<br><b>Clave:</b> ${f.clue}</div>
+</div>`).join("")}
+</div>
+<div class="card">
+<div class="notice warn">Has seleccionado <b>${state.selected.length}/3</b>. Piensa también en la materia prima que necesitarás después.</div>
+<div class="actions"><button onclick="go2()" ${state.selected.length===3?"":"disabled"}>Llevar estos lotes al laboratorio →</button></div>
+</div>`;
+}
+
+function toggleFruit(id){
+if(state.selected.includes(id)) state.selected=state.selected.filter(x=>x!==id);
+else if(state.selected.length<3) state.selected.push(id);
+phase1();
+}
+
+function go2(){if(state.selected.length===3){state.phase=1;phase2()}}
+
+function phase2(){
+let content=`
+<div class="card intro">
+<div class="symbol">♻️</div><div>
+<div class="stage">Fase 2 de 4</div>
+<h2>No todo lo recuperado tiene que acabar en la receta</h2>
+<p>Ahora tienes que decidir qué hacer con cada parte. Esta fase es importante porque <b>tu inventario para la siguiente fase dependerá exactamente de lo que hagas aquí</b>.</p>
+${progress(45)}
+</div></div>`;
+state.selected.forEach(id=>{
+let f=fruits.find(x=>x.id===id);
+content+=`<div class="card"><h2>${f.emoji} ${f.name} · ${f.kg} kg</h2><p>${f.clue}</p>`;
+f.parts.forEach(([key,emoji,desc])=>{
+let selected=state.partChoices[id+"_"+key]||"";
+content+=`
+<div class="partcard">
+<div class="parthead"><div><span class="partemoji">${emoji}</span> <b>${capitalize(key)}</b></div><small>${desc}</small></div>
+<div class="options">
+<div class="option ${selected==="use"?"active":""}" onclick="setPart('${id}','${key}','use')"><strong>✅ APROVECHAR</strong><span>Entra en la producción.</span></div>
+<div class="option ${selected==="reserve"?"active":""}" onclick="setPart('${id}','${key}','reserve')"><strong>📦 RESERVAR</strong><span>No entra todavía; queda disponible para otro uso.</span></div>
+<div class="option ${selected==="waste"?"active":""}" onclick="setPart('${id}','${key}','waste')"><strong>🗑️ RESIDUO</strong><span>No se utiliza en el proceso.</span></div>
+</div></div>`;
+});
+content+=`</div>`;
+});
+let ready=allPartsChosen();
+content+=`<div class="card"><div class="notice">💡 <b>Ojo:</b> reservar una parte no equivale a aprovecharla en la receta actual. Puede reducir el material disponible para fabricar la chuchería.</div><div class="actions"><button onclick="go3()" ${ready?"":"disabled"}>Pasar al diseño de la receta →</button></div></div>`;
+app().innerHTML=content;
+}
+function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function setPart(id,key,value){state.partChoices[id+"_"+key]=value;phase2()}
+function allPartsChosen(){
+return state.selected.every(id=>{
+let f=fruits.find(x=>x.id===id);
+return f.parts.every(p=>state.partChoices[id+"_"+p[0]]);
+});
+}
+function go3(){if(allPartsChosen()){state.phase=2;phase3()}}
+
+function getResources(){
+let r={pulpa:0,zumo:0,cascaras:0,piel:0,reservado:0};
+state.selected.forEach(id=>{
+let f=fruits.find(x=>x.id===id);
+f.parts.forEach(([key])=>{
+let c=state.partChoices[id+"_"+key];
+if(c==="use"){
+if(key==="pulpa")r.pulpa+=f.kg*.55;
+if(key==="zumo")r.zumo+=f.kg*.30;
+if(key==="cascara")r.cascaras+=f.kg*.12;
+if(key==="piel")r.piel+=f.kg*.12;
+}
+if(c==="reserve")r.reservado+=f.kg*.12;
+});
+});
+return r;
+}
+function phase3(){
+let r=getResources();
+app().innerHTML=`
+<div class="card intro">
+<div class="symbol">🧪</div><div>
+<div class="stage">Fase 3 de 4</div>
+<h2>Diseña la chuchería con lo que realmente tienes</h2>
+<p>Tu inventario no es igual al del principio. Las decisiones anteriores han cambiado los recursos disponibles. Ahora debes elegir una receta que tenga sentido.</p>
+${progress(68)}
+</div></div>
+<div class="card">
+<h3>📦 Recursos disponibles para producción</h3>
+<div class="inventory">
+<div class="inv"><b>${r.pulpa.toFixed(1)} kg</b><small>pulpa</small></div>
+<div class="inv"><b>${r.zumo.toFixed(1)} kg</b><small>zumo</small></div>
+<div class="inv"><b>${(r.cascaras+r.piel).toFixed(1)} kg</b><small>piel/cáscara</small></div>
+<div class="inv"><b>${r.reservado.toFixed(1)} kg</b><small>reservado</small></div>
+</div>
+</div>
+<div class="recipe-grid">
+${recipes.map(rp=>`
+<div class="recipe ${state.recipe===rp.id?"active":""}" onclick="chooseRecipe('${rp.id}')">
+<div class="emoji">${rp.emoji}</div>
+<h2>${rp.name}</h2>
+<p><b>Necesita:</b> ${rp.need}</p>
+<p>${rp.logic}</p>
+</div>`).join("")}
+</div>
+<div class="card">
+<div class="notice warn">🧠 <b>Decisión crítica:</b> no estás eligiendo la receta que “suena mejor”. Estás eligiendo qué transformación es posible con lo que has decidido recuperar.</div>
+<div class="actions"><button onclick="go4()" ${state.recipe?"":"disabled"}>Empezar la producción →</button></div>
+</div>`;
+}
+function chooseRecipe(id){state.recipe=id;phase3()}
+function go4(){if(state.recipe){state.phase=3;state.incident=incidents[Math.floor(Math.random()*incidents.length)];phase4()}}
+
+function phase4(){
+let inc=state.incident;
+app().innerHTML=`
+<div class="card intro">
+<div class="symbol">⚠️</div><div>
+<div class="stage">Fase 4 de 4</div>
+<h2>El laboratorio no sale siempre según el plan</h2>
+<p>Ha aparecido un problema. Tu objetivo es resolverlo sin olvidar el aprovechamiento, la seguridad y la gestión responsable del residuo.</p>
+${progress(88)}
+</div></div>
+<div class="card">
+<div class="incident">
+<div class="incident-icon">${inc.icon}</div>
+<h2>${inc.title}</h2>
+<p>${inc.text}</p>
+<div class="inc-options">
+${inc.choices.map((c,i)=>`
+<div class="inc-option ${state.incidentChoice===i?"active":""}" onclick="chooseIncident(${i})"><b>${c[0]}</b></div>`).join("")}
+</div>
+</div>
+<div class="actions"><button onclick="finish()" ${state.incidentChoice!==null?"":"disabled"}>Ver el resultado del proceso →</button></div>
+</div>`;
+}
+function chooseIncident(i){state.incidentChoice=i;phase4()}
+function finish(){state.phase=4;finalPhase()}
+
+function recipeWorks(r){
+if(state.recipe==="gummies")return r.pulpa>=2 && r.zumo>=.5;
+if(state.recipe==="strips")return r.pulpa>=2 && (r.cascaras+r.piel)>=.2;
+if(state.recipe==="citrus")return r.zumo>=1 && r.cascaras>=.15;
+return false;
+}
+function finalPhase(){
+let r=getResources();
+let recipeOk=recipeWorks(r);
+let incidentOk=state.incident.choices[state.incidentChoice][1]==="good";
+let successful=recipeOk&&incidentOk;
+let selectedNames=state.selected.map(id=>fruits.find(f=>f.id===id).name).join(", ");
+let totalKg=state.selected.reduce((a,id)=>a+fruits.find(f=>f.id===id).kg,0);
+let used=r.pulpa+r.zumo+r.cascaras+r.piel;
+let estimatedWaste=Math.max(0,totalKg-used-r.reservado);
+let recipeName=recipes.find(x=>x.id===state.recipe).name;
+let recipeExplanation=recipeOk
+?"La receta que elegiste sí encaja con los recursos que conservaste."
+:"La receta que elegiste necesita recursos que no tienes en cantidad suficiente. Esto es consecuencia de decisiones tomadas en las fases anteriores.";
+let incidentExplanation=incidentOk
+?"Ante el imprevisto, elegiste una respuesta que intenta conservar el aprovechamiento sin ignorar el problema."
+:"Ante el imprevisto, la decisión elegida aumenta el desperdicio o no controla bien el problema.";
+app().innerHTML=`
+<div class="card result">
+<div class="big">${successful?"🏆":"🧠"}</div>
+<div class="stage">Resultado del laboratorio</div>
+<h2>${successful?"¡Has cerrado bien el ciclo!":"El reto te ha obligado a replantearte el proceso"}</h2>
+<p>${successful
+?"Has conectado las cuatro fases: selección, aprovechamiento, transformación y gestión del imprevisto."
+:"El proceso muestra por qué reducir el desperdicio requiere tomar decisiones pensando en las consecuencias de cada fase."}</p>
+<div class="result-grid">
+<div class="result-stat"><b>${selectedNames}</b><small>lotes recuperados</small></div>
+<div class="result-stat"><b>${recipeName}</b><small>transformación elegida</small></div>
+<div class="result-stat"><b>${estimatedWaste.toFixed(1)} kg</b><small>residuo estimado no valorizado</small></div>
+<div class="result-stat"><b>${r.reservado.toFixed(1)} kg</b><small>material reservado</small></div>
+</div>
+<div class="explain">
+<h3>🔍 ¿Qué ha pasado?</h3>
+<p>${recipeExplanation}</p>
+<p>${incidentExplanation}</p>
+<h3>♻️ La idea del proyecto</h3>
+<p>El desperdicio alimentario no se soluciona simplemente escogiendo la fruta “más bonita”. Hay que <b>identificar qué sigue siendo aprovechable, separar correctamente, encontrar una transformación adecuada y decidir qué hacer con los restos</b>.</p>
+</div>
+<div class="actions" style="justify-content:center">
+<button onclick="restart()">🔄 Volver a jugar</button>
+</div>
+</div>`;
+}
+function restart(){
+state={phase:0,selected:[],partChoices:{},recipe:null,incident:null,incidentChoice:null};
+phase1();
+}
+phase1();
+</script>
+</body>
+</html>
